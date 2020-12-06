@@ -45,6 +45,21 @@ export default {
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
   ],
+  manifest: {
+    name: 'サンプルマップWebアプリ',
+    description: 'マップベースWebアプリのサンプルです。',
+    theme_color: '#ff00ff',
+    background_color: '#0000ff',
+    display: 'standalone',
+    Scope: '/',
+    start_url: '/',
+    splash_pages: null
+  },
+  pwa: {
+    icon: {
+      iconSrc: 'static/pwaicon.png'
+    }
+  },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {},
