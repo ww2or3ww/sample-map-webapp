@@ -55,11 +55,6 @@ export default {
     start_url: '/',
     splash_pages: null
   },
-  pwa: {
-    icon: {
-      iconSrc: 'static/pwaicon.png'
-    }
-  },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {},
