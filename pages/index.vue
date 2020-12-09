@@ -6,75 +6,35 @@
         <vuetify-logo />
       </div>
       <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template (開発環境です！)
-        </v-card-title>
-        <v-card-text>
-          <p>
-            Vuetify is a progressive Material Design component framework for
-            Vue.js. It was designed to empower developers to create amazing
-            applications.
-          </p>
-          <p>
-            For more information on Vuetify, check out the
-            <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation </a
-            >.
-          </p>
-          <p>
-            If you have questions, please join the official
-            <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord </a
-            >.
-          </p>
-          <p>
-            Find a bug? Report it on the github
-            <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board </a
-            >.
-          </p>
-          <p>
-            Thank you for developing with Vuetify and I look forward to bringing
-            more exciting features in the future.
-          </p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3" />
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
+        <GmapMap
+          ref="gmp"
+          map-type-id="roadmap"
+          :center="maplocation"
+          :zoom="zoom"
+          :style="styleMap"
+          :options="mapOptions"
+        >
+          <GmapMarker
+            v-for="(m, index) in markers"
+            :key="index"
+            :title="m.title"
+            :position="m.position"
+            :clickable="true"
+            :draggable="false"
+            :icon="m.pinicon"
+            @click="onClickMarker(index, m)"
+          />
+          <GmapInfoWindow
+            :options="infoOptions"
+            :position="infoWindowPos"
+            :opened="infoWinOpen"
+            @closeclick="infoWinOpen = false"
           >
-            Nuxt Documentation
-          </a>
-          <br />
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" nuxt to="/inspire"> Continue </v-btn>
-        </v-card-actions>
+            <p style="color: #000">
+              {{ marker.title }}
+            </p>
+          </GmapInfoWindow>
+        </GmapMap>
       </v-card>
     </v-col>
   </v-row>
@@ -88,6 +48,65 @@ export default {
   components: {
     Logo,
     VuetifyLogo,
+  },
+  data() {
+    return {
+      maplocation: { lat: 0, lng: 0 },
+      zoom: 12,
+      styleMap: {
+        width: '100%',
+        height: '400px',
+      },
+      mapOptions: {
+        streetViewControl: false,
+        styles: [],
+      },
+      infoOptions: {
+        minWidth: 200,
+        pixelOffset: {
+          width: 0,
+          height: -35,
+        },
+      },
+      infoWindowPos: null,
+      infoWinOpen: false,
+      marker: {
+        title: '',
+        position: { lat: 0, lng: 0 },
+      },
+      markers: [
+        {
+          title: '佐鳴湖',
+          position: { lat: 34.7054595, lng: 137.6852776 },
+        },
+        {
+          title: '浜名湖ガーデンパーク',
+          position: { lat: 34.7140247, lng: 137.6032967 },
+        },
+      ],
+    }
+  },
+  async mounted() {
+    const currentPosTmp = await this.getCurrentPosition()
+    const currentPos = {
+      lat: currentPosTmp.coords.latitude,
+      lng: currentPosTmp.coords.longitude,
+    }
+    this.maplocation = currentPos
+  },
+  methods: {
+    getCurrentPosition() {
+      return new Promise(function (resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      })
+    },
+    onClickMarker(index, marker) {
+      this.$refs.gmp.panTo(marker.position)
+      this.infoWindowPos = marker.position
+      this.marker = marker
+      this.srcImage = null
+      this.infoWinOpen = true
+    },
   },
 }
 </script>
